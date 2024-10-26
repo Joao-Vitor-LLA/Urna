@@ -1,7 +1,11 @@
 from common import *
 
 if __name__ == "__main__":
-    p1 = Eleitores("Joao", 123, 332, 78, 87)
-    print(p1)
-    p2 = Candidatos("Bozonaro",1722,22)
-    print(p2)
+    e1 = Eleitores("Joao", 123, 332, 78, 87)
+    c1 = Candidatos("Bozonaro",1722,22)
+
+    eleitores = [e1]
+    candidatos = [c1]
+    urna = Urna()
+    urna.eleitores_csv(eleitores)
+    urna.candidatos_csv(candidatos)
