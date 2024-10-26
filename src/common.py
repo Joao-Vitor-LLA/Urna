@@ -1,6 +1,7 @@
 from typing import List
 import csv
 
+
 class Pessoa:
     nome: str
     cpf: int
@@ -17,9 +18,9 @@ class Eleitores(Pessoa):
     titulo: int
     zona: int
     secao: int
-    voto: int
+    voto: bool = False
 
-    def __init__(self, titulo, zona, secao, nome, cpf):
+    def __init__(self, nome, cpf, titulo, zona, secao):
         super().__init__(nome, cpf)
         self.titulo = titulo
         self.zona = zona
@@ -30,10 +31,10 @@ class Eleitores(Pessoa):
 
 
 class Candidatos(Pessoa):
-    numero : int
-    votos : int = 0
+    numero: int
+    votos: int = 0
 
-    def __init__(self,nome,cpf,numero):
+    def __init__(self, nome, cpf, numero):
         super().__init__(nome, cpf)
         self.numero = numero
 
@@ -41,14 +42,13 @@ class Candidatos(Pessoa):
         return f"Nome: {self.nome}, CPF: {self.cpf}, Numero: {self.numero}, Votos: {self.votos}"
 
 
-class Urna():
-
+class Urna:
     def eleitores_csv(self, eleitores: List[Eleitores], nome_arquivo='eleitores.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'CPF', 'Titulo', 'Zona', 'Secao'])
+            writer.writerow(['Nome', 'CPF', 'Titulo', 'Zona', 'Secao','Votou'])
             for eleitor in eleitores:
-                writer.writerow([eleitor.nome, eleitor.cpf, eleitor.titulo, eleitor.zona, eleitor.secao])
+                writer.writerow([eleitor.nome, eleitor.cpf, eleitor.titulo, eleitor.zona, eleitor.secao,eleitor.voto])
 
     def candidatos_csv(self, candidatos: List[Candidatos], nome_arquivo='candidatos.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
@@ -56,3 +56,39 @@ class Urna():
             writer.writerow(['Nome', 'CPF', 'Numeros', 'Votos'])
             for candidato in candidatos:
                 writer.writerow([candidato.nome, candidato.cpf, candidato.numero, candidato.votos])
+
+    def votar(self, eleitores: List[Eleitores], candidatos: List[Candidatos], ):
+        titulo = int(input("Digite seu titulo: "))
+        eleitor = None
+        candidato = None
+
+        for e in eleitores:
+            if e.titulo == titulo:
+                eleitor = e
+                break
+
+        if eleitor:
+            print(eleitor.nome)
+
+            if not eleitor.voto:
+                while candidato == None:
+                    voto = int(input("Digite seu voto: "))
+
+                    for c in candidatos:
+                        if c.numero == voto:
+                            candidato = c
+                            break
+
+                    if candidato:
+                        candidato.votos += 1
+                        eleitor.voto = True
+                        print(f"Voto registrado para {candidato.nome}.")
+
+                    else:
+                        print("Numero invalido")
+
+            else:
+                print("Este eleitor já votou.")
+
+        else:
+            print("Erro: Título do eleitor não encontrado.")
