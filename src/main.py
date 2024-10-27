@@ -9,7 +9,9 @@ if __name__ == "__main__":
 
     eleitores = [e1, e2, e3]
     candidatos = [c1, c2]
-    urna = Urna()
-    urna.votar(eleitores,candidatos)
+    urna = Urna(candidatos)
+    for i in eleitores:
+        urna.votar(eleitores, candidatos)
+    print(urna.computar() + " Ganhou!")
     urna.eleitores_csv(eleitores)
     urna.candidatos_csv(candidatos)

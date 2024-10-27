@@ -43,6 +43,9 @@ class Candidatos(Pessoa):
 
 
 class Urna:
+    def __init__(self, candidatos: List[Candidatos]):
+        self.candidatos = candidatos
+
     def eleitores_csv(self, eleitores: List[Eleitores], nome_arquivo='eleitores.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
@@ -57,7 +60,7 @@ class Urna:
             for candidato in candidatos:
                 writer.writerow([candidato.nome, candidato.cpf, candidato.numero, candidato.votos])
 
-    def votar(self, eleitores: List[Eleitores], candidatos: List[Candidatos], ):
+    def votar(self, eleitores: List[Eleitores], candidatos: List[Candidatos]):
         titulo = int(input("Digite seu titulo: "))
         eleitor = None
         candidato = None
@@ -92,3 +95,16 @@ class Urna:
 
         else:
             print("Erro: Título do eleitor não encontrado.")
+
+    def computar(self) -> str:
+        campeao = None
+        max_votos = -1
+
+        for candidato in self.candidatos:
+            if candidato.votos > max_votos:
+                max_votos = candidato.votos
+                campeao = candidato.nome
+
+        return campeao if campeao else "Nenhum vencedor"
+
+
