@@ -31,7 +31,7 @@ class Eleitores(Pessoa):
 
 
 class Candidatos(Pessoa):
-    numero: int
+    numero: str
     votos: int = 0
 
     def __init__(self, nome, cpf, numero):
@@ -43,22 +43,36 @@ class Candidatos(Pessoa):
 
 
 class Urna:
-    def __init__(self, candidatos: List[Candidatos]):
+    brancos: int
+    nulo: int
+
+    def __init__(self, candidatos: List[Candidatos], brancos=0, nulo=0):
+        self.nulo = nulo
+        self.brancos = brancos
         self.candidatos = candidatos
 
     def eleitores_csv(self, eleitores: List[Eleitores], nome_arquivo='eleitores.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'CPF', 'Titulo', 'Zona', 'Secao','Votou'])
+            writer.writerow(['Nome', 'CPF', 'Titulo', 'Zona', 'Secao', 'Votou'])
             for eleitor in eleitores:
-                writer.writerow([eleitor.nome, eleitor.cpf, eleitor.titulo, eleitor.zona, eleitor.secao,eleitor.voto])
+                writer.writerow([eleitor.nome, eleitor.cpf, eleitor.titulo, eleitor.zona, eleitor.secao, eleitor.voto])
 
     def candidatos_csv(self, candidatos: List[Candidatos], nome_arquivo='candidatos.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'CPF', 'Numeros', 'Votos'])
+            writer.writerow(['Nome', 'CPF', 'Numeros'])
             for candidato in candidatos:
-                writer.writerow([candidato.nome, candidato.cpf, candidato.numero, candidato.votos])
+                writer.writerow([candidato.nome, candidato.cpf, candidato.numero])
+
+    def urna_csv(self, candidatos: List[Candidatos], nome_arquivo='urna.csv'):
+        with open(nome_arquivo, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Nome', 'votos'])
+            for candidato in candidatos:
+                writer.writerow([candidato.nome,candidato.votos])
+            writer.writerow(['Nulos', self.nulo])
+            writer.writerow(['Brancos', self.brancos])
 
     def votar(self, eleitores: List[Eleitores], candidatos: List[Candidatos]):
         titulo = int(input("Digite seu titulo: "))
@@ -74,21 +88,26 @@ class Urna:
             print(eleitor.nome)
 
             if not eleitor.voto:
-                while candidato == None:
-                    voto = int(input("Digite seu voto: "))
+                voto = input("Digite seu voto: ")
 
-                    for c in candidatos:
-                        if c.numero == voto:
-                            candidato = c
-                            break
+                for c in candidatos:
+                    if c.numero == voto:
+                        candidato = c
+                        break
 
-                    if candidato:
-                        candidato.votos += 1
-                        eleitor.voto = True
-                        print(f"Voto registrado para {candidato.nome}.")
+                if candidato:
+                    candidato.votos += 1
+                    print(f"Voto registrado para {candidato.nome}.")
 
-                    else:
-                        print("Numero invalido")
+                if voto == "branco":
+                    print("Votou em branco")
+                    self.brancos += 1
+
+                elif not candidato:
+                    self.nulo += 1
+                    print("Voto anulado")
+
+                eleitor.voto = True
 
             else:
                 print("Este eleitor já votou.")
@@ -104,7 +123,6 @@ class Urna:
             if candidato.votos > max_votos:
                 max_votos = candidato.votos
                 campeao = candidato.nome
+            candidato.votos += self.brancos
 
         return campeao if campeao else "Nenhum vencedor"
-
-
