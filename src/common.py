@@ -123,6 +123,5 @@ class Urna:
             if candidato.votos > max_votos:
                 max_votos = candidato.votos
                 campeao = candidato.nome
-            candidato.votos += self.brancos
 
         return campeao if campeao else "Nenhum vencedor"
