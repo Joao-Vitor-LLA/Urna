@@ -120,7 +120,7 @@ class Urna:
         max_votos = -1
 
         for candidato in self.candidatos:
-            if candidato.votos > max_votos:
+            if candidato.votos > max_votos and candidato.votos == max_votos:
                 max_votos = candidato.votos
                 campeao = candidato.nome
 
