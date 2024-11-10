@@ -99,7 +99,7 @@ class Urna:
                     candidato.votos += 1
                     print(f"Voto registrado para {candidato.nome}.")
 
-                if voto == "branco":
+                elif voto == "branco":
                     print("Votou em branco")
                     self.brancos += 1
 
@@ -118,10 +118,14 @@ class Urna:
     def computar(self) -> str:
         campeao = None
         max_votos = -1
+        empate = False
 
         for candidato in self.candidatos:
-            if candidato.votos > max_votos and candidato.votos == max_votos:
+            if candidato.votos > max_votos:
                 max_votos = candidato.votos
-                campeao = candidato.nome
+                campeao = candidato
+                empate = False
+            elif candidato.votos == max_votos:
+                empate = True
 
-        return campeao if campeao else "Nenhum vencedor"
+        return campeao.nome if campeao and not empate else "Nenhum vencedor"
