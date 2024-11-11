@@ -80,14 +80,14 @@ class Urna:
         candidato = None
 
         for e in eleitores:
-            if int(e['titulo']) == titulo:
+            if e.titulo == titulo:
                 eleitor = e
                 break
 
         if eleitor:
-            print(eleitor['nome'])
+            print(eleitor.nome)
 
-            if eleitor['Votou'] == 'False':
+            if eleitor.voto == False:
                 voto = input("Digite seu voto: ")
 
                 for c in candidatos:
@@ -107,7 +107,7 @@ class Urna:
                     self.nulo += 1
                     print("Voto anulado")
 
-                eleitor['Votou'] = 'True'
+                eleitor.voto = 'True'
 
             else:
                 print("Este eleitor já votou.")
