@@ -2,10 +2,8 @@ from common import *
 
 if __name__ == "__main__":
     with open('eleitores.csv', 'r') as file:
-        eleitores = [
-            Eleitores(e['nome'], int(e['CPF']), int(e['titulo']), int(e['Zona']), int(e['Secao']))
-            for e in csv.DictReader(file, delimiter=",")
-        ]
+        eleitores = [Eleitores(e['nome'], int(e['CPF']), int(e['titulo']), int(e['Zona']), int(e['Secao']))
+            for e in csv.DictReader(file, delimiter=",")]
 
     with open('candidatos.csv', 'r') as file:
         candidatos_data = list(csv.DictReader(file, delimiter=","))
