@@ -130,3 +130,4 @@ class Urna:
 
         return campeao.nome if campeao and not empate else "Nenhum vencedor"
 
+

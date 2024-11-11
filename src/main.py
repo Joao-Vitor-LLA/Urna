@@ -13,3 +13,4 @@ if __name__ == "__main__":
 
     urna = Urna(eleitores, candidatos)  # Cria a instância da urna passando eleitores e candidatos
     tela(eleitores, candidatos)  # Passa eleitores e candidatos para a função tela
+
