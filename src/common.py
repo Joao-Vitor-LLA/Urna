@@ -64,7 +64,7 @@ class Urna:
             writer.writerow(['nome', 'CPF', 'numero'])
             for candidato in candidatos:
                 writer.writerow([candidato.nome, candidato.cpf, candidato.numero])
-'''
+    '''
     def urna_csv(self, candidatos: List[Candidatos], nome_arquivo='urna.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
