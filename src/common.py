@@ -74,8 +74,8 @@ class Urna:
             writer.writerow(['Nulos', self.nulo])
             writer.writerow(['Brancos', self.brancos])
 
-    def votar(self, eleitores: List[dict], candidatos: List[dict]):
-        titulo = int(input("Digite seu titulo: "))
+    def votar(self, eleitores: List[dict], candidatos: List[dict],v : str):
+        titulo = 332
         eleitor = None
         candidato = None
 
@@ -88,7 +88,7 @@ class Urna:
             print(eleitor.nome)
 
             if eleitor.voto == False:
-                voto = input("Digite seu voto: ")
+                voto = v
 
                 for c in candidatos:
                     if c.numero == voto:
@@ -129,3 +129,4 @@ class Urna:
                 empate = True
 
         return campeao.nome if campeao and not empate else "Nenhum vencedor"
+
