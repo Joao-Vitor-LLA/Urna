@@ -50,44 +50,44 @@ class Urna:
         self.nulo = nulo
         self.brancos = brancos
         self.candidatos = candidatos
-
+    '''
     def eleitores_csv(self, eleitores: List[Eleitores], nome_arquivo='eleitores.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'CPF', 'Titulo', 'Zona', 'Secao', 'Votou'])
+            writer.writerow(['nome', 'CPF', 'titulo', 'Zona', 'Secao', 'Votou'])
             for eleitor in eleitores:
                 writer.writerow([eleitor.nome, eleitor.cpf, eleitor.titulo, eleitor.zona, eleitor.secao, eleitor.voto])
 
     def candidatos_csv(self, candidatos: List[Candidatos], nome_arquivo='candidatos.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'CPF', 'Numeros'])
+            writer.writerow(['nome', 'CPF', 'numero'])
             for candidato in candidatos:
                 writer.writerow([candidato.nome, candidato.cpf, candidato.numero])
-
+'''
     def urna_csv(self, candidatos: List[Candidatos], nome_arquivo='urna.csv'):
         with open(nome_arquivo, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Nome', 'votos'])
+            writer.writerow(['nome', 'votos'])
             for candidato in candidatos:
                 writer.writerow([candidato.nome,candidato.votos])
             writer.writerow(['Nulos', self.nulo])
             writer.writerow(['Brancos', self.brancos])
 
-    def votar(self, eleitores: List[Eleitores], candidatos: List[Candidatos]):
+    def votar(self, eleitores: List[dict], candidatos: List[dict]):
         titulo = int(input("Digite seu titulo: "))
         eleitor = None
         candidato = None
 
         for e in eleitores:
-            if e.titulo == titulo:
+            if int(e['titulo']) == titulo:
                 eleitor = e
                 break
 
         if eleitor:
-            print(eleitor.nome)
+            print(eleitor['nome'])
 
-            if not eleitor.voto:
+            if eleitor['Votou'] == 'False':
                 voto = input("Digite seu voto: ")
 
                 for c in candidatos:
@@ -107,7 +107,7 @@ class Urna:
                     self.nulo += 1
                     print("Voto anulado")
 
-                eleitor.voto = True
+                eleitor['Votou'] = 'True'
 
             else:
                 print("Este eleitor já votou.")
