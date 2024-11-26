@@ -1,101 +1,117 @@
-from tkinter import *
-from tkinter import messagebox
-from tkinter import ttk
-from common import *
+import os
+import tkinter as tk
+from tkinter import ttk, messagebox
+from common import Eleitores, Candidatos, Urna
+import pygame
 
-def tela(eleitores, candidatos):  # Recebe os dois parâmetros necessários
-    u = Urna(eleitores, candidatos)  # Cria a instância da urna
-    e = eleitores
-    c = candidatos
-    root = Tk()
-    teclado = ttk.Frame(root, padding=10)
-    tela = ttk.Frame(root, padding=100)
-    root.title("Urna")
-    teclado.grid(column=1, row=0)
-    tela.grid(column=0, row=0)
+u = None
+e = None
+c = None
+votou = False
 
-    n = 9
+som_path = os.path.abspath("src/som.mp3")
 
-    # Variáveis para armazenar os dados
-    confirma_str = ""  # Armazena a string formada pelos 2 valores confirmados
-    branco_str = ""  # Armazena a string "branco" quando o botão "Branco" for clicado
+def on_button_click(p):
+    current_text = label_var.get().replace("_", "")
+    if current_text == "FIM" or votou:
+        return
+    if len(current_text) < 2:
+        new_text = current_text + str(p)
+        label_var.set(new_text.ljust(2, "_"))
+        update_candidate_name(new_text)
 
+def remove_last_value():
+    current_text = label_var.get().replace("_", "")
+    if current_text == "FIM" or votou:
+        return
+    if len(current_text) > 0:
+        new_text = current_text[:-1]
+        label_var.set(new_text.ljust(2, "_"))
+        update_candidate_name(new_text)
 
-    # Função para atualizar o label com o valor clicado
-    def on_button_click(p):
-        current_text = label_var.get()
-
-        # Se o texto atual estiver vazio, apenas coloca o valor
-        if current_text == "":
-            label_var.set(f"{p}")
-        else:
-            # Caso contrário, concatena o novo valor com um espaço
-            # Limita para no máximo 2 valores
-            values = current_text.split()
-            if len(values) < 2:
-                label_var.set(f"{current_text} {p}")
-            else:
-                label_var.set(f"{values[0]} {values[1]}")  # Mantém apenas 2 valores
-
-
-    # Função para remover o último valor
-    def remove_last_value():
-        current_text = label_var.get()
-        values = current_text.split()
-
-        if len(values) > 0:
-            # Remove o último valor
-            values.pop()
-            # Atualiza o texto no label
-            if len(values) > 0:
-                label_var.set(f"{values[0]}")
-            else:
-                label_var.set("")  # Se não houver mais valores, o label ficará vazio
-
-
-    # Função para confirmar a entrada e armazenar os dois valores
-    def confirma():
-
-        global confirma_str
-        current_text = label_var.get()
-        values = current_text.split()
-
-        if len(values) == 2:  # Só confirma se houver exatamente 2 valores
-            confirma_str = f"{values[0]}{values[1]}"  # Armazena os dois valores concatenados
-            label_var.set("")  # Limpa o label para o próximo uso
-            u.votar(e, c, confirma_str)  # Chama a função votar com os parâmetros corretos
-        else:
+def confirma():
+    global u, e, c, votou
+    current_text = label_var.get().replace("_", "")
+    if len(current_text) == 2:
+        if votou:
+            messagebox.showinfo("Aviso", "Você já votou!")
+            return
+        confirma_str = current_text
+        label_var.set("FIM")
+        candidate_name_var.set("")
+        u.votar(e, c, confirma_str)
+        votou = True
+        try:
+            pygame.mixer.init()
+            pygame.mixer.music.load(som_path)
+            pygame.mixer.music.play()
+        except Exception as ex:
+            messagebox.showerror("Erro", f"Erro ao reproduzir o áudio: {ex}")
+    else:
+        if not votou:
             messagebox.showwarning("Erro", "Por favor, insira exatamente dois valores.")
 
+def update_candidate_name(vote_number):
+    candidate_name_var.set("")
+    if len(vote_number) == 2:
+        for candidate in c:
+            if str(candidate.numero) == vote_number:
+                candidate_name_var.set(f"{candidate.nome}")
+                return
+        candidate_name_var.set("Nulo")
 
-    # Função para definir o valor "branco"
-    def branco():
-        global branco_str
-        branco_str = "branco"
-        print(f"Valor branco armazenado: {branco_str}")  # Apenas para depuração
-        label_var.set("")  # Limpa o label para o próximo uso
+def cria_interface(urna, eleitores, candidatos):
+    global u, e, c, candidate_name_var, label_var, votou
+    u = urna
+    e = eleitores
+    c = candidatos
 
+    root = tk.Tk()
+    root.title("Urna Eletrônica")
+    root.geometry("500x300")
 
-    # Botões de números (1 a 9)
-    for i in range(3):
-        for j in range(3):
-            button = ttk.Button(teclado, text=n, command=lambda n=n: on_button_click(n))
-            button.grid(column=j, row=i)
-            n -= 1
+    container = ttk.Frame(root)
+    container.pack(padx=10, pady=10, fill="both", expand=True)
 
-    # Botões extras
-    button = ttk.Button(teclado, text=0, command=lambda: on_button_click(0)).grid(column=1, row=4)
-    button = ttk.Button(teclado, text="Branco", command=branco).grid(column=0, row=4)
-    button = ttk.Button(teclado, text="Confirma", command=confirma).grid(column=2, row=4)
+    label_var = tk.StringVar(value="__")
+    label = ttk.Label(
+        container,
+        textvariable=label_var,
+        font=("Courier", 24),
+        anchor="center",
+        width=10,
+        relief="solid",
+        padding=(10, 5),
+    )
+    label.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
-    # Botão "Remover" à direita
-    button_remove = ttk.Button(root, text="Remover", command=remove_last_value)
-    button_remove.grid(row=1, column=1, padx=10, pady=10)
+    candidate_name_var = tk.StringVar(value="")
+    candidate_label = ttk.Label(
+        container,
+        textvariable=candidate_name_var,
+        font=("Arial", 14),
+        anchor="center",
+    )
+    candidate_label.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
 
-    # Definir a variável vinculada ao label
-    label_var = StringVar()
-    label = ttk.Label(root, textvariable=label_var, font=("Arial", 14))
-    label.grid(row=1, column=0, padx=10, pady=10)
+    teclado_frame = ttk.Frame(container)
+    teclado_frame.grid(row=0, column=1, padx=10, pady=10)
+
+    for i in range(1, 10):
+        btn = ttk.Button(teclado_frame, text=str(i), command=lambda p=i: on_button_click(p), width=5)
+        row, col = divmod(i - 1, 3)
+        btn.grid(row=row, column=col, padx=5, pady=5)
+
+    btn_0 = ttk.Button(teclado_frame, text="0", command=lambda: on_button_click(0), width=5)
+    btn_0.grid(row=3, column=1, padx=5, pady=5)
+
+    botoes_frame = ttk.Frame(container)
+    botoes_frame.grid(row=1, column=1, padx=10, pady=10)
+
+    corrigir_btn = ttk.Button(botoes_frame, text="Corrigir", command=remove_last_value, width=12)
+    corrigir_btn.grid(row=0, column=0, padx=10, pady=5)
+
+    confirmar_btn = ttk.Button(botoes_frame, text="Confirmar", command=confirma, width=12)
+    confirmar_btn.grid(row=0, column=1, padx=10, pady=5)
 
     root.mainloop()
-
